@@ -2,25 +2,13 @@ Selectimus (Beta)
 
 Change of standart selects in browser.
 
-Для работы необходима библиотека ScrollBarJS (добавлена в плагин).
-Существует несколько версий:
-
-1. Плагин jQuery
-Selectimus (Beta)
-
-Change of standart selects in browser.
-
 
 For working you need to use ScrollBarJS library (just has been added to plugin).
 
-There are two versions: 
-
 1. jQuery plugin
-2. JavaScript library 
 
 
 1. 
-
 Init - $.selectimus(select_data [, styles] [, settings]);
 
 select_data - jQuery object or hash, which looks like:
@@ -46,8 +34,6 @@ settings - Addition options to adjust design of substisution select:
 	height: factor [1 .. 10]  - add to height of subselect 5*factor pixels
 	rows:   number [2 .. 20]  - set rows' quantity into subselect
 
-
-Если есть какие-либо предложения, пожелания, найденные баги - пишите :)
 
 If you have anything offers, wishes or you have found a bug - write to me :)
 
