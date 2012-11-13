@@ -1,3 +1,62 @@
-Selectimus
+Selectimus (Beta)
 
 Change of standart selects in browser.
+
+Для работы необходима библиотека ScrollBarJS (добавлена в плагин).
+Существует несколько версий:
+
+1. Плагин jQuery
+Selectimus (Beta)
+
+Change of standart selects in browser.
+
+
+For working you need to use ScrollBarJS library (just has been added to plugin).
+
+There are two versions: 
+
+1. jQuery plugin
+2. JavaScript library 
+
+
+1. 
+
+Init - $.selectimus(select_data [, styles] [, settings]);
+
+select_data - jQuery object or hash, which looks like:
+    {
+        0: document.getElementById(id),
+	1: document.getElementsByTagName(name)[0],
+	...
+    }
+
+
+styles - Hash which includes styles. Styles apply to container in which substisution select is created. If nothing styles was transfered, would apply default styles.
+
+	background:      'white',
+	display:         'block',
+	border:          '1px solid #e5e5e5',
+	'border-radius': '5px',
+	margin:          '3px 0',
+	position:        'relative',
+	overflow:        'visible'
+
+settings - Addition options to adjust design of substisution select:
+	width:  factor [1 .. 10]  - add to width of subselect 5*factor pixels
+	height: factor [1 .. 10]  - add to height of subselect 5*factor pixels
+	rows:   number [2 .. 20]  - set rows' quantity into subselect
+
+
+Если есть какие-либо предложения, пожелания, найденные баги - пишите :)
+
+If you have anything offers, wishes or you have found a bug - write to me :)
+
+---------------------------------------
+
+
+Egor Skorobogatov
+egor.skorobogatov@gmail.com
+
+
+
+
