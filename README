@@ -2,13 +2,12 @@ Selectimus (Beta)
 
 Change of standart selects in browser.
 
-
-For working you need to use ScrollBarJS library (just has been added to plugin).
+For work  you need to use ScrollBarJS library (has just been added to plugin).
 
 1. jQuery plugin
 
-
 1. 
+
 Init - $.selectimus(select_data [, styles] [, settings]);
 
 select_data - jQuery object or hash, which looks like:
@@ -19,7 +18,7 @@ select_data - jQuery object or hash, which looks like:
     }
 
 
-styles - Hash which includes styles. Styles apply to container in which substisution select is created. If nothing styles was transfered, would apply default styles.
+styles - Hash which includes styles. Styles apply to container in which substitution select is created. If no styles was transferred, default styles would be applied to.
 
 	background:      'white',
 	display:         'block',
@@ -29,20 +28,21 @@ styles - Hash which includes styles. Styles apply to container in which substisu
 	position:        'relative',
 	overflow:        'visible'
 
-settings - Addition options to adjust design of substisution select:
+settings - Addition options to adjust design of substitution select:
+
 	width:  factor [1 .. 10]  - add to width of subselect 5*factor pixels
 	height: factor [1 .. 10]  - add to height of subselect 5*factor pixels
 	rows:   number [2 .. 20]  - set rows' quantity into subselect
 
 
-If you have anything offers, wishes or you have found a bug - write to me :)
+
+
+If you have any offers, comments or if you find a bug – do not hesitate to write me:)
 
 ---------------------------------------
 
 
 Egor Skorobogatov
 egor.skorobogatov@gmail.com
-
-
 
 
