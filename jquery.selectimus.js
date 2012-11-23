@@ -211,7 +211,9 @@
 	    self.div.css({
 		borderBottom: self.opt.up.borderTop,
 		borderLeft:   self.opt.up.borderTop,
-		borderRight:  self.opt.up.borderTop
+		borderRight:  self.opt.up.borderTop,
+		overflow:     self.opt.up.overflow,
+		height:       self.opt.up.height
 	    });
 	    self.box
 		.css({
@@ -246,7 +248,8 @@
 	}, function (e) {
 	    self.opened = false;
 	    self.div.css({
-		border: self.opt.up.border
+		border: self.opt.up.border,
+		height: self.opt.down.height
 	    });
 	    self.box
 		.css({
@@ -396,47 +399,43 @@
 	   
 	   
 	   (function draggable() {
-	       var stop  = true,
-		   top,
-		   y;
-		   
-		   
-	       self.slider.mousedown(function (e) {
-		   stop = false;
-		   top = parseInt(self.slider.css('top'));
-		   y = e.clientY;
-	       });
-	       
-	       self.slider.mouseup(function (e) {
-		   stop = true;
-	       });
-	       
-	       self.slider.mousemove(function (e) {
-		   if (stop === true) {
-		       return false;
-		   }
-		   
-		   if (top + e.clientY - y < 1) {
-		       self.slider.css({
-			   'top': 0
-		       });
-		       return false;
-		   } else if (top + e.clientY - y > self.params.stopScroll - 1) {
-		       self.slider.css({
-			   'top': self.params.stopScroll
-		       });
-		       return false;
-		   } else {
-		       self.slider.css({
-			   'top': (top + e.clientY - y) + 'px'
-		       });
-		       
-		       self.scrollcontent.css({
-			   'margin-top': self.params.multiple*(-1 * (top + e.clientY - y)) + 'px'
-		       });
-		   }
-		   
-	       });
+		var top,
+		    y;
+		    
+		self.slider.mousedown(function (e) {
+		    _window.bind('mousemove', moveSlider);
+		    _window.one('mouseup', mouseupSlider);
+		    top = parseInt(self.slider.css('top'));
+		    y = e.clientY;
+		});
+		
+		
+		function mouseupSlider(e) {
+		    _window.unbind('mousemove', moveSlider);
+		}
+		
+		function moveSlider(e) {
+		    if (top + e.clientY - y < 1) {
+			self.slider.css({
+			    'top': 0
+			});
+			return false;
+		    } else if (top + e.clientY - y > self.params.stopScroll - 1) {
+			self.slider.css({
+			    'top': self.params.stopScroll
+			});
+			return false;
+		    } else {
+			self.slider.css({
+			    'top': (top + e.clientY - y) + 'px'
+			});
+			
+			self.scrollcontent.css({
+			    'margin-top': self.params.multiple*(-1 * (top + e.clientY - y)) + 'px'
+			});
+		    }
+		}
+		
 	       
 	   })();
 	   

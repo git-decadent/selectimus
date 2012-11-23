@@ -18,7 +18,6 @@
 .selectimus .select-box {
 	overflow: hidden;
 	width: inherit;
-	/*z-index: 1000;*/
 	left: 0;
 	position: absolute;
 }
@@ -36,7 +35,6 @@
 	position: absolute;
 	cursor: pointer;
 	background: url('images/arrow-up-down.png') 0 0 no-repeat;
-	/* background-repeat: ;*/
 }
 .w-srcollbar-wrap .w-srcoll-bottom {
 	bottom: 0;
