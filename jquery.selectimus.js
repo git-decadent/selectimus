@@ -15,7 +15,6 @@
 
 (function ($) {
     var _window = $(window),
-	// обязательные стили для селектов по-умолчанию
 	default_styles = function () {
 	    return {
 		background: 'white',
@@ -27,20 +26,15 @@
 		overflow: 'visible'
 	    }
 	},
-	// количество строк в развернутом селекте
 	default_rows   = 10,
-        // хэш для всех созданных селектов
 	select_hash    = {},
-        // счетчик количества селектов
 	len            = 0;
     
-    // добавление метода объекту jQuery
     $.fn.selectimus = function (styles, settings) {
 	var def_style = default_styles(),
 	    len = this.length,
 	    i;
-	
-        // замена/добавление стилией для псевдоселекта    
+	  
 	if (styles != undefined) {
 	    for (i in styles) {
 		def_style[i] = styles[i];
@@ -60,7 +54,6 @@
 	return this;
     }
     
-    // Установка дополнительныйх опций у псевдоселекта
     function setSettings(opt, style) {
 	var _options = {
 	    width: 5,
@@ -74,31 +67,22 @@
 	}
     }
     
-    // Замена селекта
     function changeSelect(element, def_style, settings) {
-	    // Внутренние опции селекта
-	//var options = children(element),
 	var options = element.children(),
-	    // стили селекта
 	    styles  = getStyles(element[0], def_style, settings),
-	    // псевдоселект    
 	    clone   = new createClone(styles, element, options, settings);
 	    
 	select_hash[element.attr('id')] = clone;
 	len++;
-	// скрываем селект
 	element.css('display', 'none');
-	// и вставляем клона
 	clone.div.insertBefore(element);
     }
     
-    // Получение стилей селекта
     function getStyles(element, def_style, settings) {
 	var result = {},
 	    value,
 	    styles = element.style;
 	
-	// Функция вынимает все возможные стили из селекта
 	function getStyle(elem, name) {
 	    if (elem.style[name]) {
 		return elem.style[name];
@@ -120,19 +104,15 @@
 	
 	for (var i in styles) {
 	    value = getStyle(element, i);
-	    // Если стиль не пустой - сохранить его.
 	    if (value != '' && value != 'none' && typeof value != 'function') {
 		result[i] = value;
 	    }
 	}
 	
-	// Добавляем в результат стили по-умолчанию и
-	// стили переданные пользователем
 	for (var i in def_style) {
 	    result[i] = def_style[i]
 	}
 	
-	// Если переданы доп. опции, применить их стилям
 	if (settings != undefined) {
 	    setSettings(settings, result);
 	}
@@ -140,27 +120,18 @@
 	return result;
     }
     
-    // Создание псевдоселекта
     function createClone(styles, element, options, settings) {
 	this.selected   = {};
 	this.parent     = $(element);
-	// псевдоселект (верхний элемент)
 	this.div        = $('<div>');
-	// контейнер содержимого
 	this.box        = $('<div>');
-	// содержание селекта
 	this.content    = createContent.call(this, styles, element, options);
-	// кнопка раскрытия селекта
 	this.button     = $('<div>');
-	// хэш со стилями
 	this.opt        = {};
 	var tmp_rows    = (settings != undefined && settings.rows != undefined) ? settings.rows : default_rows;
-	// количество элементов внутри селекта
 	var rows        = options.length < tmp_rows ? options.length : tmp_rows;
-	// флаг открытого/закрытого селекта
 	this.opened     = false;
 	    
-	// добавляем ему стили, которые были у селекта
 	for (var i in styles) {
 	    this.div.css(i, styles[i]);
 	}
@@ -168,14 +139,12 @@
 	this.button.addClass('select-button-close');
 	this.box.addClass('select-box');
 	
-	// стили для свернутого псевдоселекта
 	this.opt.down = {
 	    height:   styles.height,
 	    overflow: 'hidden',
 	    border:    '0 none',
 	    zIndex:    0
 	};
-	// стили для раскрытого псевдоселекта
 	this.opt.up = {
 	    rows: rows,
 	    heightContent: options.length * parseInt(styles.height) + 'px',
@@ -202,7 +171,6 @@
 	
     }
     
-    // Создание контента псевдоселекта
     function createContent(styles, element, options) {
 	var self = this,
 	    table = $('<table>'),
@@ -234,12 +202,10 @@
 	return table;
     }
     
-    // Прикрепление обработчиков событий для нового псевдоселекта
     function setEvents() {
 		
 	var self = this;
 	
-	// первый клик на селекте
 	this.div.toggle(function (e) {
 	    self.opened = true;
 	    self.div.css({
@@ -277,7 +243,6 @@
 		self.div.click();
 	    });
 	    
-	// повторный клик на селекте
 	}, function (e) {
 	    self.opened = false;
 	    self.div.css({
@@ -320,7 +285,6 @@
 	}
 	return result;
     }
-    // Установка контента в псевдоселекте в случае отсутствия скроллбара
     function moveTo(margin, down) {
 	
 	var _margin;
@@ -331,7 +295,6 @@
 	    _margin = 0;
 	}
 	
-	// мгновенная установка
 	this.content.css({
 	    'margin-top': _margin + 'px'
 	});
@@ -351,14 +314,11 @@
     $.scrollbar = function (data) {
 	   
        var def_opt = {
-	       // ширина скроллбара
 	       btnsWidth:    16,
 	       btnsHeight:   16,
 	       bordersWidth: 1
 	   };
 	   
-       // Установка пропорций слайдера относительно
-       // прокручиваемого контента
        function sizeSlider(scrollpane, scrollcontent, _slider) {
 	   var scrollpane_h     = scrollpane.height();
 	       scrollcontent_h  = scrollcontent.height();
@@ -381,20 +341,13 @@
 	   }
 	   
 	   return {
-	       // высота контейнера
 	       scrollpane_h:     scrollpane_h,
-	       // высота контента
 	       scrollcontent_h:  scrollcontent_h,
-	       // высота контейнера скроллбара
 	       scrollbar_wrap_h: scrollbar_wrap_h,
-	       // высота слайдера
 	       size_slider:      size_slider,
-	       // коэфициент увеличения высоты контента, при движении скролла
 	       multiple:         multiple,
 	       stopScroll:       stopScroll,
-	       // количество пикселей в одном проценте движения у контента
 	       percentContent:   percentContent,
-	       // количество пикселей в одном проценте движения у слайдера
 	       percentSlider:    percentSlider
 	   };
        }
@@ -404,68 +357,44 @@
 	   var self = this,
 	       interval;
 	   
-	   // контейнер контента
 	   this.scrollpane    = data.scrollpane;
-	   // контент
 	   this.scrollcontent = data.scrollcontent;
 	   
 	   
-	   // параметры
 	   this.params = sizeSlider(this.scrollpane, this.scrollcontent);
 	   
-	   // кнопка скролла наверх
 	   this.scroll_top      = $('<div>').addClass('w-srcoll-top w-srcoll-btn').css({
 	       width: 	def_opt.btnsWidth + 'px',
 	       height: def_opt.btnsWidth + 'px',
 	       backgroundPosition: + (def_opt.btnsWidth - 14)/2 + "px " + (def_opt.btnsWidth - 14)/2 + "px "
 	   });
-	   // кнопка скролла вниз
 	   this.scroll_bottom   = $('<div>').addClass('w-srcoll-bottom w-srcoll-btn').css({
 	       width: 	def_opt.btnsWidth  + 'px',
 	       height: def_opt.btnsWidth + 'px',
-	       //backgroundPosition: + (def_opt.width - 16)/2 + "px " + (def_opt.width - 16)/2 + "px "
 	       backgroundPosition: + (def_opt.btnsWidth - 14)/2 + "px 112%"
 	   });
-	   // контейнер скроллбара
 	   this.scrollbar_wrap  = $('<div>').addClass('w-srcollbar-wrap').css({
 	       height: 	this.params.scrollbar_wrap_h,
 	       width: 		def_opt.btnsWidth
 	   });
-	   // скроллбар
 	   this.scrollbar       = $('<div>').addClass('w-srcollbar').css({
 	       height: 	this.params.scrollbar_wrap_h - def_opt.btnsWidth*2,
 	       marginTop: 	def_opt.btnsWidth + 'px',
 	       width:  	def_opt.btnsWidth + 'px'  
 	   });
-	   // слайдер
 	   this.slider          = $('<div>').addClass('w-slider').css({
 	       top:		 0,
 	       width: 		 def_opt.btnsWidth - 2 + 'px',
 	       height: 	 this.params.size_slider + 'px'
 	   }).append( "<span style='margin:"+ this.params.size_slider/2 +"px auto;' class='ui-icon ui-icon-grip-dotted-horizontal'></span>" );
-	   
-	   // Сборка элементов    
+	     
 	   this.scrollbar_wrap.append(this.scroll_top);
 	   this.scrollbar_wrap.append(this.scrollbar);
 	   this.scrollbar_wrap.append(this.scroll_bottom);
 	   this.scrollbar.append(this.slider);
 	   this.scrollbar_wrap.appendTo(this.scrollpane);
 	   
-	   /*
-	   // инициализации слайдера
-	   this.slider.draggable({
-	       axis: 'y',
-	       containment: "parent",
-	       drag: function (event, ui) {
-		   var margin = self.params.multiple*(-1 * ui.position.top)
-		   
-		   self.scrollcontent.css({
-		       'margin-top': margin + 'px'
-		   }); 
-	       }
-	   });*/
 	   
-	   // инициализации слайдера
 	   (function draggable() {
 	       var stop  = true,
 		   top,
@@ -511,12 +440,10 @@
 	       
 	   })();
 	   
-	   // Предотвращение ухода события за пределы скролбара
 	   this.scrollbar_wrap.click(function (e) {
 	       e.stopPropagation();
 	   });
 	   
-	   // перемотка при нажатии на кнопки
 	   this.scroll_top.add(this.scroll_bottom).bind({
 	       'mousedown': function (e) {
 		   e.stopPropagation();
@@ -537,9 +464,7 @@
 		       }
 		       self.slider.css('top',  top + it + 'px');
 		       self.scrollcontent.css('margin-top', -1*self.params.multiple*(top + it) + 'px');
-		       /*if (listeners.drag != undefined) {
-			   listeners.drag(-1*multiple*(top + it));
-		       }*/
+
 		   }, 4);
 	       },
 	       'mouseup': function (e) {
@@ -549,23 +474,17 @@
 	   });
 	   
 	   
-	   // перемотка при клике на свободном месте скроллбара
 	   this.scrollbar.bind('click', function (e) {
 	       if (e.target != self.scrollbar[0]) {
 		   return false; 
 	       }
-		   // место клика
 	       var clickY 	= e.pageY,
-		   // верхняя граница слайдера
 		   posY 	= self.slider.offset().top,
-		   // верхняя граница контента
 		   contentY = parseInt(self.scrollcontent.css('margin-top')),
-		   // координаты остановки
 		   target,
 		   i = 0,
 		   j;
 	       
-	       // перемотка вверх или вниз
 	       if (clickY < posY) {
 		   target = clickY - posY;
 		   j      = -1 * Math.round(self.params.scrollcontent_h/self.params.scrollpane_h*2);
@@ -587,16 +506,12 @@
 	   });
 	   
        }
-       // Перемотка селекта на указанное место,
-       // скролбар устанавливается пропорционально
        _Scrollbar.prototype.move = function (margin, set) {
 	   
 	   var _margin,
 	       params = this.params,
 	       top;
 	   
-	   // Если прокрутка контента ухожид за пределы контейнера,
-	   // то перемотать до границы
 	   if (margin < params.scrollpane_h - params.scrollcontent_h) {
 	       _margin = params.scrollpane_h - params.scrollcontent_h;
 	   } else {
@@ -607,30 +522,25 @@
 	   
 	   
 	   this.slider.css('top', top + 'px');
-	   // перемотка
 	   if (set == undefined) {
 	       this.scrollcontent.animate({
 		   'margin-top': _margin + 'px'
 	       }, 800);
 	   } else {
-	   // мгновенная установка
 	       this.scrollcontent.css({
 		   'margin-top': set == true ? margin : _margin + 'px'
 	       });
 	   }
        }
        
-       // показать слайдер
        _Scrollbar.prototype.show = function () {
 	   this.scrollbar_wrap.css('display', 'block');
        }
        
-       // скрыть слайдер
        _Scrollbar.prototype.hide = function () {
 	   this.scrollbar_wrap.css('display', 'none');
        }
        
-       // обновить слайдер
        _Scrollbar.prototype.renew = function (slider) {
 	   sizeSlider(this.scrollpane, this.scrollcontent, this.slider);
        }
