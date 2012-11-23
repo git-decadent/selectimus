@@ -1,7 +1,7 @@
 /*!
  *
  * Selectimus 0.1.0
- * Copyright 2012, Egor Skorobogatov
+ * Copyright 2012, Egor Skorobogatov 
  * egor.skorobogatov@gmail.com
  *
  * Released under the MIT, BSD, and GPL Licenses
