@@ -6,16 +6,8 @@ For work  you need to use ScrollBarJS library (has just been added to plugin).
 
 1. jQuery plugin
 
-1. 
 
-Init - $.selectimus(select_data [, styles] [, settings]);
-
-select_data - jQuery object or hash, which looks like:
-    {
-        0: document.getElementById(id),
-	1: document.getElementsByTagName(name)[0],
-	...
-    }
+Init - $(element).selectimus([styles] [, settings]);
 
 
 styles - Hash which includes styles. Styles apply to container in which substitution select is created. If no styles was transferred, default styles would be applied to.
