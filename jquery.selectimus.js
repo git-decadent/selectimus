@@ -1,7 +1,7 @@
 /*!
  *
  * Selectimus 0.1.0
- * Copyright 2012, Egor Skorobogatov 
+ * Copyright 2012, Egor Skorobogatov
  * egor.skorobogatov@gmail.com
  *
  * Released under the MIT, BSD, and GPL Licenses
@@ -19,7 +19,7 @@
 	    return {
 		background: 'white',
 		display: 'block',
-		border: '1px solid #e5e5e5',
+		border: '1px solid #b6b6b6',
 		'border-radius': '5px',
 		margin: '3px 0',
 		position: 'relative',
@@ -30,11 +30,12 @@
 	select_hash    = {},
 	len            = 0;
     
+	
     $.fn.selectimus = function (styles, settings) {
 	var def_style = default_styles(),
 	    len = this.length,
 	    i;
-	  
+	
 	if (styles != undefined) {
 	    for (i in styles) {
 		def_style[i] = styles[i];
@@ -68,6 +69,7 @@
     }
     
     function changeSelect(element, def_style, settings) {
+	
 	var options = element.children(),
 	    styles  = getStyles(element[0], def_style, settings),
 	    clone   = new createClone(styles, element, options, settings);
@@ -140,7 +142,8 @@
 	this.box.addClass('select-box');
 	
 	this.opt.down = {
-	    height:   styles.height,
+	    height_div:   styles.height,
+	    height_box:   window.navigator.appName == 'Opera'  ? (parseInt(styles.height) - 2*parseInt(styles.borderWidth) + 'px') : styles.height,
 	    overflow: 'hidden',
 	    border:    '0 none',
 	    zIndex:    0
@@ -157,7 +160,7 @@
 	};
 	
 	this.box.css({
-	    height: this.opt.down.height,
+	    height: this.opt.down.height_box,
 	    background: styles.background,
 	    'border-radius': styles['border-radius']
 	});
@@ -175,17 +178,24 @@
 	var self = this,
 	    table = $('<table>'),
 	    tbody = $('<tbody>'),
+	    height,
 	    tr;
 	    
 	table.addClass('selectimus-table')
 	
+	if (window.navigator.appName == 'Opera') {
+	    height = parseInt(styles.height) - 2 + 'px'; 
+	} else {
+	    height = styles.height;
+	}
+	    
 	$.each(options, function (k, v) {
 	    if (v.value == element.val()) {
 		self.selected.count = k;
 		self.selected.id    = element.val();
 	    }
 	    tr = $('<tr>');
-	    tr.css('height', styles.height);
+	    tr.css('height', height);
 	    tr.html('<td>' + v.innerHTML + '</td>');
 	    tbody.append(tr);
 	    (function (j, val) {
@@ -236,9 +246,9 @@
 	    }
 	    if (self.scrollbar != false) {
 		self.scrollbar.show();
-		self.scrollbar.move(-1 * self.selected.count * parseInt(self.opt.down.height), false);
+		self.scrollbar.move(-1 * self.selected.count * parseInt(self.opt.down.height_box), false);
 	    } else {
-		moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height));
+		moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height_box));
 	    }
 	    
 	    _window.one('click', function () {
@@ -249,20 +259,22 @@
 	    self.opened = false;
 	    self.div.css({
 		border: self.opt.up.border,
-		height: self.opt.down.height
+		height: self.opt.down.height_div
 	    });
 	    self.box
 		.css({
 		    border:    self.opt.down.border,
 		    borderTop: self.opt.up.borderTop,
-		    height:    self.opt.down.height,
+		    height:    self.opt.down.height_box,
 		    zIndex:    self.opt.down.zIndex
 		});
+		
+		
 	    if (self.scrollbar != false) {
-		self.scrollbar.move(-1 * self.selected.count * parseInt(self.opt.down.height), true);
+		self.scrollbar.move(-1 * self.selected.count * parseInt(self.opt.down.height_box), true);
 		self.scrollbar.hide();
 	    } else {
-		moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height), true);
+		moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height_box), true);
 	    }
 	    self.box.find('TD').unbind();
 	    self.box.find('TD').eq(self.selected.count).removeClass('td_hover');
@@ -303,18 +315,19 @@
 	});
     }
 
-/*
- *
- * ScrollBarJS 1.0.0
- * Copyright 2012, Egor Skorobogatov
- * egor.skorobogatov@gmail.com
- *
- * Released under the MIT, BSD, and GPL Licenses
- *
- * Change of standart scrollbar in html elements in browser.
- *
- */
-    $.scrollbar = function (data) {
+    /*
+    *
+    * ScrollBarJS 1.0.0
+    * Copyright 2012, Egor Skorobogatov
+    * egor.skorobogatov@gmail.com
+    *
+    * Released under the MIT, BSD, and GPL Licenses
+    *
+    * Change of standart scrollbar in html elements in browser.
+    *
+    */
+   
+   $.scrollbar = function (data) {
 	   
        var def_opt = {
 	       btnsWidth:    16,
@@ -323,36 +336,37 @@
 	   };
 	   
        function sizeSlider(scrollpane, scrollcontent, _slider) {
-	   var scrollpane_h     = scrollpane.height();
-	       scrollcontent_h  = scrollcontent.height();
-	       scrollbar_wrap_h = scrollpane_h - scrollpane_h*0.02,
-	       diff1	    	 = scrollcontent_h - scrollpane_h,
-	       prop	         = diff1 / scrollcontent_h,
-	       scroll_area 	 = scrollbar_wrap_h - def_opt.btnsWidth*2;
-	       stopScroll  	 = Math.floor(scroll_area*prop),
-	       size_slider 	 = scrollbar_wrap_h - def_opt.btnsWidth*2 - stopScroll - def_opt.bordersWidth*2,
-	       multiple    	 = diff1/(scrollbar_wrap_h - def_opt.btnsWidth*2 - size_slider),
-	       multiple    	 = scrollcontent_h/scroll_area,
-	       percentContent 	 = diff1/100,
-	       percentSlider    = stopScroll/100;
+	    var scrollpane_h      = scrollpane.height();
+		scrollcontent_h   = scrollcontent.height();
+		scrollbar_wrap_h  = scrollpane_h - scrollpane_h*0.02,
+		diff1	    	 = scrollcontent_h - scrollpane_h,
+		prop	         = diff1 / scrollcontent_h,
+		scroll_area 	 = scrollbar_wrap_h - def_opt.btnsWidth*2;
+		stopScroll  	 = Math.floor(scroll_area*prop),
+		size_slider 	 = scrollbar_wrap_h - def_opt.btnsWidth*2 - stopScroll - def_opt.bordersWidth*2,
+		multiple    	 = diff1/(scrollbar_wrap_h - def_opt.btnsWidth*2 - size_slider),
+		multiple    	 = scrollcontent_h/scroll_area,
+		percentContent 	 = diff1/100,
+		percentSlider    = stopScroll/100;
 	       
 	   
 	   
-	   if (_slider != undefined) {
-	       size_slider = height2;
-	       _slider.height(height2);
-	   }
+	    if (_slider != undefined) {
+		size_slider = height2;
+		_slider.height(height2);
+	    }
 	   
-	   return {
-	       scrollpane_h:     scrollpane_h,
-	       scrollcontent_h:  scrollcontent_h,
-	       scrollbar_wrap_h: scrollbar_wrap_h,
-	       size_slider:      size_slider,
-	       multiple:         multiple,
-	       stopScroll:       stopScroll,
-	       percentContent:   percentContent,
-	       percentSlider:    percentSlider
-	   };
+	    return {
+		scrollpane_h:     scrollpane_h,
+		scrollcontent_h:  scrollcontent_h,
+		scrollcontent_stop: scrollpane_h - scrollcontent_h,
+		scrollbar_wrap_h: scrollbar_wrap_h,
+		size_slider:      size_slider,
+		multiple:         multiple,
+		stopScroll:       stopScroll,
+		percentContent:   percentContent,
+		percentSlider:    percentSlider
+	    };
        }
        
        
@@ -390,19 +404,19 @@
 	       width: 		 def_opt.btnsWidth - 2 + 'px',
 	       height: 	 this.params.size_slider + 'px'
 	   }).append( "<span style='margin:"+ this.params.size_slider/2 +"px auto;' class='ui-icon ui-icon-grip-dotted-horizontal'></span>" );
-	     
+	   
 	   this.scrollbar_wrap.append(this.scroll_top);
 	   this.scrollbar_wrap.append(this.scrollbar);
 	   this.scrollbar_wrap.append(this.scroll_bottom);
 	   this.scrollbar.append(this.slider);
 	   this.scrollbar_wrap.appendTo(this.scrollpane);
 	   
-	   
 	   (function draggable() {
 		var top,
 		    y;
 		    
 		self.slider.mousedown(function (e) {
+		    e.preventDefault();
 		    _window.bind('mousemove', moveSlider);
 		    _window.one('mouseup', mouseupSlider);
 		    top = parseInt(self.slider.css('top'));
@@ -419,10 +433,16 @@
 			self.slider.css({
 			    'top': 0
 			});
+			self.scrollcontent.css({
+			    'margin-top': 0
+			});
 			return false;
 		    } else if (top + e.clientY - y > self.params.stopScroll - 1) {
 			self.slider.css({
 			    'top': self.params.stopScroll
+			});
+			self.scrollcontent.css({
+			    'margin-top': self.params.scrollcontent_stop + 'px'
 			});
 			return false;
 		    } else {
@@ -483,7 +503,7 @@
 		   target,
 		   i = 0,
 		   j;
-	       
+
 	       if (clickY < posY) {
 		   target = clickY - posY;
 		   j      = -1 * Math.round(self.params.scrollcontent_h/self.params.scrollpane_h*2);
@@ -505,6 +525,7 @@
 	   });
 	   
        }
+
        _Scrollbar.prototype.move = function (margin, set) {
 	   
 	   var _margin,
@@ -547,6 +568,5 @@
        return new _Scrollbar(data);  
    }
    
-    
 })(jQuery);
 
