@@ -14,7 +14,9 @@ styles - Hash which includes styles. Styles apply to container in which substitu
 
 	background:      'white',
 	display:         'block',
-	border:          '1px solid #e5e5e5',
+	'border-width':   1',
+	'border-style':  'solid',
+	'border-color':  '#e5e5e5',
 	'border-radius': '5px',
 	margin:          '3px 0',
 	position:        'relative',
