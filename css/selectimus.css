@@ -5,7 +5,10 @@
 	font-weight: inherit;
 	width: 100%;
 }
-
+.selectimus  .selectimus-table {
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+}
 .selectimus-table  TD {
 	margin: 0;
 	padding: 0 0 0 5px;
@@ -14,7 +17,6 @@
 	background: #7ea0fa;
 	color: white;
 }
-
 .selectimus .select-box {
 	overflow: hidden;
 	width: inherit;
@@ -24,7 +26,6 @@
 .selectimus .select-button-close {
 	position: absolute;
 	background: url('images/arrow-up-down.png') 0 0 no-repeat;
-	top: 22%;
 	right: 1px;
 	width: 16px;
 	height: 16px;
@@ -54,7 +55,7 @@
 .w-srcollbar-wrap:hover {
 	opacity: 1;
 }
-.w-srcollbar-wrap  .w-slider {
+.w-srcollbar-wrap .w-slider {
 	background-color: #EADEDE;
 	border: 1px solid #969696;
 	border-radius: 3px 3px 3px 3px;
