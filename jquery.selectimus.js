@@ -25,6 +25,7 @@
 		'border-color': '#b6b6b6',
 		'border-radius': '5px',
 		margin: '3px 0',
+		padding: 0,
 		position: 'relative',
 		overflow: 'visible'
 	    }
@@ -50,7 +51,6 @@
 	    }
 	}
 	def_style.border = def_style['border-width'] + 'px ' + def_style['border-style'] + ' ' + def_style['border-color'];
-	
         // function use for all the passed elements
 	$.each(this, function (k, v) {
 	    var el = $(v);
@@ -103,43 +103,11 @@
     function getStyles(element, def_style, settings) {
 	var result = {},
 	    value,
-	    styles = element[0].style;
+            styles = ['width', 'height'];
 
-	// The function takes all the possible styles out of the select
-	function getStyle(elem, name) {
-	    var currStyle;
-	    if (elem.style[name]) {
-		return elem.style[name];
-	    } else {
-		if (elem.currentStyle) {
-                    // the current style specification  existence check 
-                    // in browser
-		    try {
-			currStyle = elem.currentStyle[name];
-		    } catch (e) {
-		    }
-		    return currStyle;
-		} else {
-		    if (document.defaultView && document.defaultView.getComputedStyle) {
-			name = name.replace(/(A-Z)/g, "-$1");
-			name = name.toLowerCase();
-			var s = document.defaultView.getComputedStyle(elem, "");
-			return s && s.getPropertyValue(name);
-		    } else {
-		    	return null;
-		    }
-		}
-	    }
-	}
-	
-	for (var i in styles) {
-	    value = getStyle(element[0], i);
-            // if the style is not empty-save it
-	    if (value != '' && value != 'none' && typeof value != 'function') {
-		result[i] = value;
-	    }
-	}
         // Add the default styles and the styles passed by the user to the result
+        result.height = element[0].clientHeight;
+        result.width  = element[0].clientWidth;
 	for (var i in def_style) {
 	    result[i] = def_style[i];
 	}
@@ -153,7 +121,6 @@
 	if (settings != undefined) {
 	    setSettings(settings, result);
 	}
-        
 	return result;
     }
     // subselect creation
@@ -184,7 +151,7 @@
 	// Styles for convoluted pseudoelect
 	this.opt.down = {
 	    height_div: styles.height,
-	    height_box: window.navigator.appName == 'Opera'  ? (parseInt(styles.height) - 2*parseInt(styles.borderWidth) + 'px') : styles.height,
+	    height_box: window.navigator.appName == 'Opera'  ? (parseInt(styles.height) - 2*parseInt(styles['border-width']) + 'px') : styles.height,
 	    overflow:   'hidden',
 	    border:     '0 none',
 	    zIndex:     0
@@ -202,7 +169,8 @@
 	    border:        styles.border,
 	    borderTop:     '0 none',
 	    zIndex:        100000000
-	};
+	};	
+
 	// Setup the button in the center in accordance with the pseudoselect height
 	this.button
             .addClass('select-button-close')
