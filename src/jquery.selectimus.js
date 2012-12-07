@@ -241,7 +241,7 @@
 			self.selected.count = j;
 			self.selected.id    = val;
 		    }
-		});
+		});  
 	    })(k, v.value);
 	});
 	
