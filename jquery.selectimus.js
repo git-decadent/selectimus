@@ -104,27 +104,38 @@
 	var result = {},
 	    value,
             styles = ['width', 'height'];
-
+            
         // Add the default styles and the styles passed by the user to the result
-        result.height = element[0].clientHeight;
-        result.width  = element[0].clientWidth;
+        result.height         = element[0].clientHeight >= 22 ? element[0].clientHeight : 22;
+        //result.height         = element[0].clientHeight;
+        result.width          = element[0].clientWidth;
+        
+        if (window.navigator.appName == 'Opera') {
+            result['line-height'] = result.height  - def_style['border-width']*2 + 'px';
+	} else {
+	    result['line-height'] = result.height + 'px';
+	}
+        
 	for (var i in def_style) {
 	    result[i] = def_style[i];
 	}
 	
 	// For Safari – take out some style by means of the set keys
-	if (window.navigator.appVersion.search('Safari') >= 0) {
+	/*if (window.navigator.vendor.search('Apple') >= 0) {
 	    result.width  = element.outerWidth() - def_style['border-width'] + 'px';
 	    result.height = element.outerHeight() - def_style['border-width'] + 'px';
-	}
+	}*/
+        
         // If extra options are passed than use them to the styles
 	if (settings != undefined) {
 	    setSettings(settings, result);
 	}
+        
 	return result;
     }
     // subselect creation
     function createClone(styles, element, options, settings) {
+        
         // link to the changing select  chosen option 
 	this.selected   = {};
 	this.parent     = $(element);
@@ -148,28 +159,29 @@
 	for (var i in styles) {
 	    this.div.css(i, styles[i]);
 	}
-	// Styles for convoluted pseudoelect
+	// Styles for convoluted subselect
 	this.opt.down = {
 	    height_div: styles.height,
-	    height_box: window.navigator.appName == 'Opera'  ? (parseInt(styles.height) - 2*parseInt(styles['border-width']) + 'px') : styles.height,
+	    //height_box: window.navigator.appName == 'Opera'  ? (parseInt(styles.height) - 2*parseInt(styles['border-width']) + 'px') : styles.height,
+	    height_box: styles.height,
 	    overflow:   'hidden',
 	    border:     '0 none',
-	    zIndex:     0
+	    zIndex:     1
 	};
-        // Styles for open pseudoselect
+        // Styles for open subselect
 	this.opt.up = {
 	    rows: rows,
 	    heightContent: options.length * parseInt(styles.height) + 'px',
 	    height_div:    (rows * parseInt(styles.height)) + 'px',
 	    height_box:    window.navigator.appName.search('Microsoft') >= 0  ?
-			    (rows * parseInt(styles.height) - 2*parseInt(styles.borderWidth) + 'px') :
+			    (rows * parseInt(styles.height) - 2*parseInt(styles['border-width']) + 'px') :
 			    (rows * parseInt(styles.height)) + 'px',
 	    overflow:      'visible',
 	    position:      'absolute',
 	    border:        styles.border,
 	    borderTop:     '0 none',
 	    zIndex:        100000000
-	};	
+	};
 
 	// Setup the button in the center in accordance with the pseudoselect height
 	this.button
@@ -196,77 +208,81 @@
     }
     // Subselect content creation
     function createContent(styles, element, options) {
-	var self = this,
-	    table = $('<table>'),
-	    tbody = $('<tbody>'),
+        var self = this,
+	    ul   = $('<ul>'),
 	    height,
-	    tr;
-	    
-	table.addClass('selectimus-table')
+	    li;
+        
+        ul.addClass('selectimus_ul');
 	
         // Correction for Opera. Consider the height of the frames while
         // finding the select under change height, the frames height is to be taken off 
-
+        
 	if (window.navigator.appName == 'Opera') {
 	    height = parseInt(styles.height) - styles['border-width']*2 + 'px'; 
 	} else {
 	    height = styles.height;
 	}
-        // Subselect table lines
+        
+        
+        // Subselect list lines
 	$.each(options, function (k, v) {
 	    if (v.value == element.val()) {
 		self.selected.count = k;
 		self.selected.id    = element.val();
 	    }
-	    tr = $('<tr>');
-	    tr.css('height', height);
-	    tr.html('<td>' + v.innerHTML + '</td>');
-	    tbody.append(tr);
+	    li = $('<li>').css('height', height).html(v.innerHTML)
+              
+	    ul.append(li);
 	    (function (j, val) {
-                // When click the table line, the attached select  chosen option is changed
-		tr.click(function () {
-		    if (self.opened == true) {
+                // When click the list line, the attached select chosen option is changed
+		li.click(function () {
+		    if (self.opened === true) {
 			self.selected.count = j;
 			self.selected.id    = val;
 		    }
 		});
 	    })(k, v.value);
 	});
-	table.append(tbody);
 	
-	return table;
+	return ul;
     }
-    // Event agents for the new pseudoselect attach
+    
+    // Event agents for the new subselect attach
     function setEvents() {
 		
 	var self = this;
 	
         // the first select click
-	this.div.toggle(function (e) {
-	    self.opened = true;
-	    self.div.css({
-		borderBottom: self.opt.up.borderTop,
-		borderLeft:   self.opt.up.borderTop,
-		borderRight:  self.opt.up.borderTop,
-		overflow:     self.opt.up.overflow,
-		height:       self.opt.up.height_div
-	    });
+        function _open(e) {
+            documentClick();
+            e.stopPropagation();
+            self.opened = true;
+	    self.button.hide();
+	    self.div
+                .css({
+                    borderBottom: self.opt.up.borderTop,
+                    borderLeft:   self.opt.up.borderTop,
+                    borderRight:  self.opt.up.borderTop,
+                    overflow:     self.opt.up.overflow,
+                    height:       self.opt.up.height_div,
+		    zIndex:       self.opt.up.zIndex
+                });
 	    self.box
 		.css({
 		    position:  self.opt.up.position,
 		    border:    self.opt.up.border,
 		    borderTop: self.opt.up.borderTop,
-		    height:    self.opt.up.height_box,
-		    zIndex:    self.opt.up.zIndex
+		    height:    self.opt.up.height_box
 		});
 		
-	    self.box.find('TD').eq(self.selected.id).addClass('td_hover');
+	    self.box.find('LI').eq(self.selected.id).addClass('sel_hover');
 	    
-	    self.box.find('TD').hover(function () {
-		self.box.find('TD').removeClass('td_hover');
-		$(this).addClass('td_hover');
+	    self.box.find('LI').bind('mouseenter', function () {
+		self.box.find('LI').removeClass('sel_hover');
+		$(this).addClass('sel_hover');
 	    });
-	    
+                
 	    if (self.scrollbar == undefined) {
 		self.scrollbar = setScrolbar(self.box, self.content, self.opt);
 	    }
@@ -276,27 +292,24 @@
 	    } else {
 		moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height_box));
 	    }
-	    
             // When click on any place of the document the select is to be rolled down
-	    /*_document.one('click', function () {
-		self.div.click();
-	    });*/
-            _document.bind('click', closeSelect);
-	
+            _document.one('click', _hide);
+        }
+        
         // Repeated click on the select    
-	}, function (e) {
+        function _hide(e) {
 	    self.opened = false;
-            _document.unbind('click', closeSelect)
+	    self.button.show();
 	    self.div.css({
 		border: self.opt.up.border,
-		height: self.opt.down.height_div
+		height: self.opt.down.height_div,
+		    zIndex:       self.opt.down.zIndex
 	    });
 	    self.box
 		.css({
 		    border:    self.opt.down.border,
 		    borderTop: self.opt.up.borderTop,
-		    height:    self.opt.down.height_box,
-		    zIndex:    self.opt.down.zIndex
+		    height:    self.opt.down.height_box
 		});	
 		
 	    if (self.scrollbar != false) {
@@ -305,19 +318,30 @@
 	    } else {
 		moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height_box), true);
 	    }
-	    self.box.find('TD').unbind();
-	    self.box.find('TD').eq(self.selected.count).removeClass('td_hover');
+            
+	    self.box.find('LI').unbind('mouseenter');
+	    self.box.find('LI').removeClass('sel_hover');
+            
+            
 	    self.parent.val(self.selected.id);
-	});
-        
-        function closeSelect() {
-	    self.div.click();
+            self.div.one('click', _open)
+        }
+        this.div.one('click', _open)
+    }
+    
+    // Checking for activated selected
+    function documentClick() {
+        for (var i in select_hash) {
+            if (select_hash[i].opened === true) {
+                select_hash[i].div.click();
+            }
         }
     }
+    
     // Scrollbar setup 
     function setScrolbar(field, content, options) {
 	var result;
-	if (options.up.height == options.up.heightContent) {
+	if (options.up.height_box == options.up.heightContent) {
 	    result = false;
 	} else {
 	    result = $.scrollbar({
@@ -338,7 +362,7 @@
 	
 	var _margin;
 	
-	if (down == true || Math.abs(margin) < this.content.height() - parseInt(this.opt.up.height)) {
+	if (down === true || Math.abs(margin) < this.content.height() - parseInt(this.opt.up.height)) {
 	    _margin = margin;
 	} else {
 	    _margin = 0;
@@ -448,9 +472,11 @@
             });
             // scrollbar
             this.scrollbar       = $('<div>').addClass('w-srcollbar').css({
-	       height: 	this.params.scrollbar_wrap_h - def_opt.btnsWidth*2,
-	       marginTop: 	def_opt.btnsWidth + 'px',
-	       width:  	def_opt.btnsWidth + 'px'  
+                position: 'relative',
+                height: 	this.params.scrollbar_wrap_h - def_opt.btnsWidth*2,
+                //marginTop: 	def_opt.btnsWidth + 'px',
+                top:     def_opt.btnsWidth + 'px', 
+                width:  	def_opt.btnsWidth + 'px'  
             });
             // slider
             this.slider          = $('<div>').addClass('w-slider').css({
@@ -470,7 +496,7 @@
 	   (function draggable() {
 		var top,
 		    y;
-                // When click on slider – start the movement	
+                // When click on slider – start the movement
 		self.slider.mousedown(function (e) {
                     // forbid the default action in order to prevent  the text highlighting  
 		    e.preventDefault();
@@ -488,6 +514,8 @@
 		}
 		// the slider position relative to it`s start position and the current cursor position calculation
 		function moveSlider(e) {
+                    
+		    e.preventDefault();
 		    if (top + e.clientY - y < 1) {
 			self.slider.css({
 			    'top': 0
@@ -526,7 +554,7 @@
             // Scrolling when press the button
             this.scroll_top.add(this.scroll_bottom).bind({
                 'mousedown': function (e) {
-                    e.stopPropagation();
+                    //e.stopPropagation();
                     var it, im;
                     if (e.target == self.scroll_top[0]) {
                         it   = -1;
@@ -550,7 +578,7 @@
                     }, 4);
                 },
                 'mouseup': function (e) {
-                    e.stopPropagation();
+                    //e.stopPropagation();
                     clearInterval(interval);
                 }
             });
@@ -619,7 +647,7 @@
 
             // Immediate setup
                 this.scrollcontent.css({
-		   'margin-top': set == true ? margin : _margin + 'px'
+		   'margin-top': set === true ? margin : _margin + 'px'
                 });
             }
         }
