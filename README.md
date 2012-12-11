@@ -1,4 +1,5 @@
-Selectimus (Beta). Script is in the process of testing. There are some problems in Safari and IE.
+<h1>Selectimus (Beta).</h1>
+Script is in the process of testing. There are some problems in Safari and IE.
 
 Change of standart selects in browser.
 
