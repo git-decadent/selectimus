@@ -59,7 +59,7 @@
 .w-srcollbar-wrap {
 	background-color: white;
 	border: 1px solid #CCCCCC;
-	border-radius: 3px 3px 3px 3px;
+	border-radius: 3px;
 	position: absolute;
 	right: 1%;
 	top: 1%;
@@ -71,8 +71,13 @@
   	filter: alpha(opacity=100);
 }
 .w-srcollbar-wrap .w-slider {
+	background-image: -moz-linear-gradient(left, #D3D3D3, #ffffff);
+        background-image: -webkit-linear-gradient(left, #D3D3D3, #ffffff);
+        background-image: -o-linear-gradient(left, #D3D3D3, #ffffff);
+        background-image: -ms-linear-gradient(left, #D3D3D3, #ffffff);
+        background-image: linear-gradient(left, #D3D3D3, #ffffff);
 	background-color: #EADEDE;
 	border: 1px solid #969696;
-	border-radius: 3px 3px 3px 3px;
+	border-radius: 3px;
 	position: relative;
 }
