@@ -1,5 +1,5 @@
 <h1>Selectimus</h1>
-<a href="http://188.127.227.198:3000/">Selectimus test page</a>
+<a target="_blank" href="http://188.127.227.198:3000/">Selectimus test page</a>
 <h3>Description</h3>
 <p>
 Selectimus jQuery plugin allows to replace standart selects in each browser by identical ones. Support of browsers: Chrome: Firefox, Opera, Safari, IE7+. 
