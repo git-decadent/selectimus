@@ -129,7 +129,6 @@
         });
         
         ul.bind('click', function (e) {
-            e.stopPropogation();
             var elem = e.target;
             
             if (self.opened === true) {
@@ -156,8 +155,8 @@
     // Scrollbar setup
     function setScrolbar(field, content, options) {
         var result;
-        
-        if (options.up.height_box == options.up.heightContent) {
+	
+        if (options.up.height == options.up.heightContent) {
             result = false;
         } else {
             result = $.scrollbar({
@@ -390,7 +389,7 @@
         });
         
         return this;
-    }
+    };
     
 /*
 *
@@ -415,71 +414,73 @@
         };
 
         // Slider proportions according to the scrolled content setup
-        function sizeSlider(scrollpane, scrollcontent, _slider) {
+        function sizeSlider(scrollpane, scrollcontent, slider) {
             
-            var scrollpane_h     = scrollpane.height();
-                scrollcontent_h  = scrollcontent.height();
-                scrollbar_wrap_h = scrollpane_h - scrollpane_h*0.02,
+            var scrollpane_h     = scrollpane.height(),
+                scrollcontent_h  = scrollcontent.height(),
+                scrollbar_wrap_h = scrollpane_h - scrollpane_h * 0.02,
                 diff1	         = scrollcontent_h - scrollpane_h,
                 prop	         = diff1 / scrollcontent_h,
-                scroll_area      = scrollbar_wrap_h - def_opt.btnsWidth*2;
-                stopScroll       = Math.floor(scroll_area*prop),
-                size_slider      = scrollbar_wrap_h - def_opt.btnsWidth*2 - stopScroll - def_opt.bordersWidth*2,
-                multiple         = diff1/(scrollbar_wrap_h - def_opt.btnsWidth*2 - size_slider),
-                multiple         = scrollcontent_h/scroll_area,
-                percentContent   = diff1/100,
-                percentSlider    = stopScroll/100;
+                scroll_area      = scrollbar_wrap_h - def_opt.btnsWidth * 2,
+                stopScroll       = Math.floor(scroll_area * prop),
+                size_slider      = scrollbar_wrap_h - def_opt.btnsWidth * 2 - stopScroll - def_opt.bordersWidth * 2,
+                //multiple         = diff1 / (scrollbar_wrap_h - def_opt.btnsWidth * 2 - size_slider),
+                multiple         = scrollcontent_h / scroll_area,
+                percentContent   = diff1 / 100,
+                percentSlider    = stopScroll / 100;
 
-            if (_slider != undefined) {
+            /*if (slider !== undefined) {
                 size_slider = height2;
-                _slider.height(height2);
-            }
+                slider.height(height2);
+            }*/
 
             return {
                 // container height
-                scrollpane_h: scrollpane_h,
+                scrollpane_h:       scrollpane_h,
                 // content height
-                scrollcontent_h: scrollcontent_h,
+                scrollcontent_h:    scrollcontent_h,
                 // content stop coordinates
                 scrollcontent_stop: scrollpane_h - scrollcontent_h,
                 // scrollbar container height
-                scrollbar_wrap_h: scrollbar_wrap_h,
+                scrollbar_wrap_h:   scrollbar_wrap_h,
                 // slider height
-                size_slider: size_slider,
+                size_slider:        size_slider,
                 // content height growth while scrolling index
-                multiple: multiple,
+                multiple:           multiple,
                 // when the coordinate limit is reached than stop the scrollbar
-                stopScroll: stopScroll,
+                stopScroll:         stopScroll,
                 // the number of pixels in one percent of movement by the content
-                percentContent: percentContent,
+                percentContent:     percentContent,
                 // the number of pixels in one percent of movement by the slider
-                percentSlider: percentSlider
+                percentSlider:      percentSlider
             };
        }
        
        
        function Scrollbar(data) {
             var self = this,
+	        setInterval,
+	        clearInterval,
                 interval;
 
             // content container
-            this.scrollpane = data.scrollpane;
+            this.scrollpane    = data.scrollpane;
             // content
             this.scrollcontent = data.scrollcontent;
             // data
-            this.params = sizeSlider(this.scrollpane, this.scrollcontent);
+            this.params        = sizeSlider(this.scrollpane, this.scrollcontent);
             // scroll up button
             this.scroll_top = $('<div>').addClass('w-srcoll-top w-srcoll-btn').css({
                 width: def_opt.btnsWidth + 'px',
                 height: def_opt.btnsWidth + 'px',
-                backgroundPosition: + (def_opt.btnsWidth - 14)/2 + "px " + (def_opt.btnsWidth - 14)/2 + "px "
+                backgroundPosition: + (def_opt.btnsWidth - 14) / 2 + "px " + (def_opt.btnsWidth - 14) / 2 + "px "
             });
             // scroll down button
             this.scroll_bottom = $('<div>').addClass('w-srcoll-bottom w-srcoll-btn').css({
                 width: def_opt.btnsWidth + 'px',
                 height: def_opt.btnsWidth + 'px',
                 //backgroundPosition: + (def_opt.width - 16)/2 + "px " + (def_opt.width - 16)/2 + "px "
-                backgroundPosition: + (def_opt.btnsWidth - 14)/2 + "px 112%"
+                backgroundPosition: (def_opt.btnsWidth - 14) / 2 + "px 112%"
             });
             // scrollbar container
             this.scrollbar_wrap = $('<div>').addClass('w-srcollbar-wrap').css({
@@ -499,7 +500,7 @@
                 top:	0,
                 width: def_opt.btnsWidth - 2 + 'px',
                 height: this.params.size_slider + 'px'
-            }).append("<span style='margin:"+ this.params.size_slider/2 +"px auto;'></span>");
+            }).append("<span style='margin:" + this.params.size_slider / 2 +"px auto;'></span>");
 
             // Elements adjustment
             this.scrollbar_wrap.append(this.scroll_top);
@@ -522,7 +523,7 @@
                     loc_document.bind('mousemove', moveSlider);
                     // stop the slider movement when the left mouse button is unpressed at any place of the document
                     loc_document.one('mouseup', mouseupSlider);
-                    top = parseInt(self.slider.css('top'));
+                    top = parseInt(self.slider.css('top'), 10);
                     y = e.clientY;
                 });
                 
@@ -535,6 +536,7 @@
                 function moveSlider(e) {
                                 
                     e.preventDefault();
+		    
                     if (top + e.clientY - y < 1) {
                         self.slider.css({
                             'top': 0
@@ -545,19 +547,18 @@
                         return false;
                     } else if (top + e.clientY - y > self.params.stopScroll - 1) {
                         self.slider.css({
-                        'top': self.params.stopScroll
+			    'top': self.params.stopScroll
                         });
                         self.scrollcontent.css({
-                        'margin-top': self.params.scrollcontent_stop + 'px'
+			    'margin-top': self.params.scrollcontent_stop + 'px'
                         });
                         return false;
                     } else {
                         self.slider.css({
                             'top': (top + e.clientY - y) + 'px'
                         });
-                        
                         self.scrollcontent.css({
-                            'margin-top': self.params.multiple*(-1 * (top + e.clientY - y)) + 'px'
+                            'margin-top': self.params.multiple * (-1 * (top + e.clientY - y)) + 'px'
                         });
                     }
                 }
@@ -573,7 +574,9 @@
             this.scroll_top.add(this.scroll_bottom).bind({
                 'mousedown': function (e) {
                     //e.stopPropagation();
-                    var it, im;
+                    var it,
+		        im,
+			stop;
                     
                     if (e.target == self.scroll_top[0]) {
                         it = -1;
@@ -583,7 +586,7 @@
                         stop = self.params.stopScroll;
                     }
                     interval = setInterval(function () {
-                        var top = parseInt(self.slider.css('top'));
+                        var top = parseInt(self.slider.css('top'), 10);
                         
                         if (top == stop) {
                             clearInterval(interval);
@@ -592,7 +595,7 @@
                         }
                         
                         self.slider.css('top', top + it + 'px');
-                        self.scrollcontent.css('margin-top', -1*self.params.multiple*(top + it) + 'px');
+                        self.scrollcontent.css('margin-top', -1 * self.params.multiple * (top + it) + 'px');
                         /*if (listeners.drag != undefined) {
                         listeners.drag(-1*multiple*(top + it));
                         }*/
@@ -616,7 +619,7 @@
                     // highest slider bound
                     posY = self.slider.offset().top,
                     //highest content bound
-                    contentY = parseInt(self.scrollcontent.css('margin-top')),
+                    contentY = parseInt(self.scrollcontent.css('margin-top'), 10),
                     // stop coordinates
                     target,
                     i = 0,
@@ -625,10 +628,10 @@
                 // Scrolling up or down
                 if (clickY < posY) {
                     target = clickY - posY;
-                    j = -1 * Math.round(self.params.scrollcontent_h/self.params.scrollpane_h*2);
+                    j = -1 * Math.round(self.params.scrollcontent_h / self.params.scrollpane_h * 2);
                 } else {
                     target = clickY - posY - self.params.size_slider;
-                    j = 1 * Math.round(self.params.scrollcontent_h/self.params.scrollpane_h*2);
+                    j = 1 * Math.round(self.params.scrollcontent_h / self.params.scrollpane_h * 2);
                 }
                 
                 interval = setInterval(function () {
@@ -639,7 +642,7 @@
                         return false;
                     }
                     self.slider.offset({top: self.slider.offset().top + j});
-                    self.scrollcontent.css('margin-top', parseInt(self.scrollcontent.css('margin-top')) - j*self.params.multiple + 'px');
+                    self.scrollcontent.css('margin-top', parseInt(self.scrollcontent.css('margin-top'), 10) - j * self.params.multiple + 'px');
                     i += j;
                 }, 1);
                 
@@ -660,7 +663,7 @@
                 loc_margin = margin;
             }
 
-            top = (Math.abs(loc_margin)/params.percentContent)*params.percentSlider;
+            top = (Math.abs(loc_margin) / params.percentContent)*params.percentSlider;
 
 
             this.slider.css('top', top + 'px');
@@ -690,6 +693,6 @@
         };
        
         return new Scrollbar(data);
-    }
+    };
    
 })(window.jQuery);
