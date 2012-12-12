@@ -129,6 +129,7 @@
         });
         
         ul.bind('click', function (e) {
+            e.stopPropogation();
             var elem = e.target;
             
             if (self.opened === true) {
