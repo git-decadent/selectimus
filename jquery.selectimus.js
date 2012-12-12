@@ -459,8 +459,6 @@
        
        function Scrollbar(data) {
             var self = this,
-	        setInterval,
-	        clearInterval,
                 interval;
 
             // content container
