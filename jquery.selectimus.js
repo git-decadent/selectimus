@@ -511,26 +511,8 @@
             (function draggable() {
                 var top,
                     y;
-                
-                // When click on slider – start the movement
-                self.slider.mousedown(function (e) {
-                    // forbid the default action in order to prevent the text highlighting
-                    e.preventDefault();
-                    // the slider should move when the cursor is moving along the whole document
-                    // while the left mouse button is pressed
-                    loc_document.bind('mousemove', moveSlider);
-                    // stop the slider movement when the left mouse button is unpressed at any place of the document
-                    loc_document.one('mouseup', mouseupSlider);
-                    top = parseInt(self.slider.css('top'), 10);
-                    y = e.clientY;
-                });
-                
-                // the slider movement stop
-                function mouseupSlider(e) {
-                    loc_document.unbind('mousemove', moveSlider);
-                }
-                
-                // the slider position relative to it`s start position and the current cursor position calculation
+		    
+		// the slider position relative to it`s start position and the current cursor position calculation
                 function moveSlider(e) {
                                 
                     e.preventDefault();
@@ -560,7 +542,25 @@
                         });
                     }
                 }
-            
+		
+                // the slider movement stop
+                function mouseupSlider(e) {
+                    loc_document.unbind('mousemove', moveSlider);
+                }
+                
+                // When click on slider – start the movement
+                self.slider.mousedown(function (e) {
+                    // forbid the default action in order to prevent the text highlighting
+                    e.preventDefault();
+                    // the slider should move when the cursor is moving along the whole document
+                    // while the left mouse button is pressed
+                    loc_document.bind('mousemove', moveSlider);
+                    // stop the slider movement when the left mouse button is unpressed at any place of the document
+                    loc_document.one('mouseup', mouseupSlider);
+                    top = parseInt(self.slider.css('top'), 10);
+                    y = e.clientY;
+                });
+                
             })();
 
             // Prevent the event`s scrollbar bounds leave
