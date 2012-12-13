@@ -2,7 +2,9 @@
 <a target="_blank" href="http://188.127.227.198:3000/">Selectimus test page</a>
 <h3>Description</h3>
 <p>
-Selectimus jQuery plugin allows to replace standart selects in each browser by identical ones. Support of browsers: Chrome: Firefox, Opera, Safari, IE7+. 
+Selectimus jQuery plugin allows to replace standart selects in each browser by identical ones. 
+For change default scrollbar jQuery plugin scrollbarJS is used which has already included for selectimus.js. 
+Support of browsers: Chrome, Firefox, Opera, Safari, IE7+. 
 Init method:
 </p>
 <div class="highlight">
