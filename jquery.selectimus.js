@@ -38,7 +38,9 @@
         // Selects number calculator
         len = 0,
         // Select minimum height
-        min_height = 16;
+        min_height = 16,
+        curr_select,
+        key_flag   = false;
 
     // subselect extra options setup
     function setSettings(opt, style) {
@@ -64,7 +66,7 @@
             styles = ['width', 'height'];
 
         // Add the default styles and the styles passed by the user to the result
-        if (def_style.height != undefined) {
+        if (def_style.height !== undefined) {
             result.height = parseInt(def_style.height, 10);
         } else {
             result.height = element[0].clientHeight >= 22 ? element[0].clientHeight : 22;
@@ -132,7 +134,7 @@
             var elem = e.target;
             
             if (self.opened === true) {
-                self.selected.count = elem.getAttribute('value');
+                self.selected.count = parseInt(elem.getAttribute('value'), 10);
                 self.selected.id    = elem.innerHTML;
             }
         });
@@ -191,6 +193,59 @@
         
     }
     
+    // Scrollbar manipulation with keys
+    function KeyCodeContructor() {
+    }
+    KeyCodeContructor.prototype.keyCodeOn = function (e) {
+        var code = e.keyCode,
+            index,
+            lines,
+            over,
+            d_heig,
+            u_heig,
+            len;
+        
+        // Capture event event only to Enter, Arrow Up and Arrow Down keys
+        if (code == 40 || code == 38 || code == 13) {
+                e.preventDefault();
+                len   = this.parent[0].length;
+                lines = this.content.find('LI');
+                // number of current line
+                over  = this.selected.over;
+                
+                // current id and position of real hidden select
+                this.selected.id    = lines.eq(over).html();
+                this.selected.count = lines.eq(over).val();
+                
+                if (code != 13) {
+                    index = code == 40 ? 1 : -1;
+                    
+                    if ((over == (len - 1) && index == 1) || (over == 0 && index == -1)) {
+                        return false;
+                    }
+                    
+                    d_heig = parseInt(this.opt.down.height, 10);
+                    u_heig = parseInt(this.opt.up.height, 10);
+                    
+                    lines.removeClass('sel_hover');
+                    lines.eq(over + index).addClass('sel_hover');
+                    this.selected.over += index;
+                    
+                    if (code == 40 && (this.selected.count * d_heig > -1 * this.current_stop * this.current_step - d_heig * 2) ||
+                        code == 38 && (this.selected.count * d_heig < -1 * this.current_stop * this.current_step - u_heig + d_heig)) {   
+                        this.current_step += index;
+                        this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false); 
+                    } 
+                // For Enter pressing cause event listener for click event on the Document -
+                // select_hide will work
+                } else {
+                    loc_document.click();
+                }
+                
+        }
+    }
+    
+    
     // Event agents for the new subselect attach
     function setEvents() {
         var self = this;
@@ -198,6 +253,7 @@
         // Repeated click on the select
         function select_hide(e) {
             
+            curr_select = undefined;
             self.opened = false;
             self.button.show();
             
@@ -207,6 +263,7 @@
                 zIndex: self.opt.down.zIndex
             });
             self.box
+                .removeClass('select-box-open')
                 .css({
                     border: self.opt.down.border,
                     borderTop: self.opt.up.borderTop,
@@ -229,11 +286,12 @@
         // the first select click
         function select_open(e) {
             
+            curr_select = self;
+
             documentClick();
             e.stopPropagation();
             self.opened = true;
             self.button.hide();
-            
             self.div
                 .css({
                     borderBottom: self.opt.up.borderTop,
@@ -244,17 +302,22 @@
                     zIndex: self.opt.up.zIndex
                 });
             self.box
+                .addClass('select-box-open')
                 .css({
                     position: self.opt.up.position,
                     border: self.opt.up.border,
                     borderTop: self.opt.up.borderTop,
                     height: self.opt.up.height
                 });
-                
+            
+            self.selected.over = self.selected.count;
             self.box.find('LI').eq(self.selected.id).addClass('sel_hover');
-            self.box.find('LI').bind('mouseenter', function () {
+            
+            self.box.find('LI').bind('mouseenter', function (e) {
                 self.box.find('LI').removeClass('sel_hover');
-                $(this).addClass('sel_hover');
+                //e.target.setAttribute('class', 'sel_hover');
+                $(e.target).attr({'class': 'sel_hover'})
+                self.selected.over = parseInt(e.target.getAttribute('value'), 10);
             });
             
             if (self.scrollbar === undefined) {
@@ -275,6 +338,29 @@
         this.div.one('click', select_open);
         
     }
+    
+    // Function for inheritance Prototype.
+    function extend(Child, Parent/*, parent_own_prop*/) {
+        var F = function() { },
+            i,
+            instance;
+        /*
+        if (parent_own_prop === true) {
+            instance = new Parent();
+            for (i in instance) {
+                if (instance.hasOwnProperty(i)) {
+                    Child[i] = instance[i]; 
+                }
+            }
+        }*/
+    
+        F.prototype = Parent.prototype;
+        Child.prototype = new F();
+        Child.prototype.constructor = Child[i];
+        Child.superclass = Parent.prototype;
+        
+    }
+    
     
     // subselect creation
     function CreateClone(styles, element, options, settings) {
@@ -337,11 +423,16 @@
                 'border-radius': styles['border-radius']
             });
 
+        
+        this.current_step = 1;
+        this.current_stop = -1 * parseInt(this.opt.up.height, 10);
+
         this.div.addClass('selectimus');
         this.box.append(this.content);
         this.div.append(this.button);
         this.div.append(this.box);
         setEvents.call(this);
+        
     }
     
     // Select change
@@ -362,6 +453,8 @@
         clone.div.insertBefore(element);
         
     }
+    
+    extend(CreateClone, KeyCodeContructor);
     
     // method add to jQuery object
     $.fn.selectimus = function (styles, settings) {
@@ -387,6 +480,12 @@
                 changeSelect($(v), def_style, settings);
             }
         });
+        
+        loc_document.bind('keydown', function (e) {
+            if (curr_select !== undefined) {
+		curr_select.keyCodeOn(e);
+            }
+	});
         
         return this;
     };
