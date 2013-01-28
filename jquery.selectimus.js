@@ -19,16 +19,19 @@
         // required styles for selects on default
         default_styles = function () {
             return {
-                background:      'white',
+		color:      '#000',
+                background: '#FFF',
+		color_up:        '#FFF',
+		background_up:   '#7ea0fa',
                 display:         'inline-block',
-                'border-width':  1,
+                'border-width':  '1px',
                 'border-style':  'solid',
                 'border-color':  '#b6b6b6',
                 'border-radius': '5px',
                 margin:          '3px 0',
                 padding:         0,
-                position:       'relative',
-                overflow:       'visible'
+                position:        'relative',
+                overflow:        'visible'
             };
         },
         // Exploded select lines number on default
@@ -227,15 +230,24 @@
                     d_heig = parseInt(this.opt.down.height, 10);
                     u_heig = parseInt(this.opt.up.height, 10);
                     
-                    lines.removeClass('sel_hover');
-                    lines.eq(over + index).addClass('sel_hover');
+		    lines.css({
+			background: this.opt.down.background,
+			color:      this.opt.down.color
+		    });
+                    lines.eq(over + index).css({
+			background: this.opt.up.background,
+			color:      this.opt.up.color
+		    });
                     this.selected.over += index;
-                    
-                    if (code == 40 && (this.selected.count * d_heig > -1 * this.current_stop * this.current_step - d_heig * 2) ||
-                        code == 38 && (this.selected.count * d_heig < -1 * this.current_stop * this.current_step - u_heig + d_heig)) {   
+		    
+		    if (code == 40 && (this.selected.count * d_heig > -1 * parseInt(this.content.css('margin-top'), 10) - this.current_stop - d_heig*2)) {
                         this.current_step += index;
                         this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false); 
-                    } 
+		    } else if (code == 38 && (this.selected.count * d_heig == -1 * parseInt(this.content.css('margin-top'), 10))) {
+                        this.current_step += index;
+                        this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false); 
+		    }
+		    
                 // For Enter pressing cause event listener for click event on the Document -
                 // select_hide will work
                 } else {
@@ -244,7 +256,6 @@
                 
         }
     }
-    
     
     // Event agents for the new subselect attach
     function setEvents() {
@@ -278,7 +289,10 @@
             }
             
             self.box.find('LI').unbind('mouseenter');
-            self.box.find('LI').removeClass('sel_hover');
+	    self.box.find('LI').css({
+		background: self.opt.down.background,
+		color:      self.opt.down.color
+	    });
             self.parent.val(self.selected.id);
             self.div.one('click', select_open);
         }
@@ -311,12 +325,20 @@
                 });
             
             self.selected.over = self.selected.count;
-            self.box.find('LI').eq(self.selected.id).addClass('sel_hover');
+            self.box.find('LI').eq(self.selected.id).css({
+		background: default_styles.background2,
+		color:      default_styles.color2
+	    });
             
             self.box.find('LI').bind('mouseenter', function (e) {
-                self.box.find('LI').removeClass('sel_hover');
-                //e.target.setAttribute('class', 'sel_hover');
-                $(e.target).attr({'class': 'sel_hover'})
+		self.box.find('LI').css({
+		    background: self.opt.down.background,
+		    color:      self.opt.down.color
+		});
+		$(e.target).css({
+		    background: self.opt.up.background,
+		    color:      self.opt.up.color
+		});
                 self.selected.over = parseInt(e.target.getAttribute('value'), 10);
             });
             
@@ -344,15 +366,6 @@
         var F = function() { },
             i,
             instance;
-        /*
-        if (parent_own_prop === true) {
-            instance = new Parent();
-            for (i in instance) {
-                if (instance.hasOwnProperty(i)) {
-                    Child[i] = instance[i]; 
-                }
-            }
-        }*/
     
         F.prototype = Parent.prototype;
         Child.prototype = new F();
@@ -396,7 +409,9 @@
             height: styles.height,
             overflow: 'hidden',
             border: '0 none',
-            zIndex: 1
+            zIndex: 1,
+	    background: styles.background,
+	    color: styles.color
         };
         // Styles for open subselect
         this.opt.up = {
@@ -407,7 +422,9 @@
             position: 'absolute',
             border: styles.border,
             borderTop: '0 none',
-            zIndex: 100000000
+            zIndex: 100000000,
+	    background: styles.background_up,
+	    color: styles.color_up
         };
         // Setup the button in the center in accordance with the pseudoselect height
         this.button
@@ -419,7 +436,7 @@
             .addClass('select-box')
             .css({
                 height: this.opt.down.height,
-                background: styles.background,
+                background: styles.background_down,
                 'border-radius': styles['border-radius']
             });
 
@@ -432,6 +449,7 @@
         this.div.append(this.button);
         this.div.append(this.box);
         setEvents.call(this);
+        moveTo.call(this, -1 * this.selected.count * parseInt(this.opt.down.height, 10), true);
         
     }
     
@@ -455,6 +473,12 @@
     }
     
     extend(CreateClone, KeyCodeContructor);
+
+    loc_document.bind('keydown', function (e) {
+	if (curr_select !== undefined) {
+	    curr_select.keyCodeOn(e);
+	}
+    });
     
     // method add to jQuery object
     $.fn.selectimus = function (styles, settings) {
@@ -462,7 +486,7 @@
         var def_style = default_styles(),
             len = this.length,
             i;
-            
+	    
         // styles add/change for subselect
         if (styles !== undefined) {
             for (i in styles) {
@@ -470,7 +494,7 @@
             }
         }
         
-        def_style.border = def_style['border-width'] + 'px ' + def_style['border-style'] + ' ' + def_style['border-color'];
+        def_style.border = def_style['border-width'] + ' ' + def_style['border-style'] + ' ' + def_style['border-color'];
         
         // function use for all the passed elements
         $.each(this, function (k, v) {
@@ -480,12 +504,7 @@
                 changeSelect($(v), def_style, settings);
             }
         });
-        
-        loc_document.bind('keydown', function (e) {
-            if (curr_select !== undefined) {
-		curr_select.keyCodeOn(e);
-            }
-	});
+	
         
         return this;
     };
