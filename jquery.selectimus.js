@@ -77,13 +77,12 @@
             result.main.height = element[0].clientHeight >= 22 ? element[0].clientHeight : 22;
         }
         result.main.width = element[0].clientWidth;
-
-        if (window.navigator.appName == 'Opera') {
-            result.main['line-height'] = result.main.height - def_style['border-width'] * 2 + 'px';
-        } else {
+        //if (window.navigator.appName == 'Opera') {
+        //    result.main['line-height'] = result.main.height + parseInt(def_style['border-width'], 10) * 2 + 'px';
+        //} else {
             result.main['line-height'] = result.main.height + 'px';
-        }
-        
+        //}
+	
         for (i in def_style) {
             if (i.search('border') >= 0) {
                 result.border[i] = def_style[i];
@@ -133,7 +132,12 @@
 
             li = $('<li>')
                 .attr({value: k})
-                .css('height', styles.main.height).html(v.innerHTML);
+                .css({
+		    'height': styles.main.height,
+		    //'height': parseInt(styles.main.height, 10) - 2 + 'px',
+		    'line-height': styles.main['line-height']
+		    //'line-height': parseInt(styles.main['line-height'], 10) + 'px' 
+		}).html(v.innerHTML);
                 
             ul.append(li);
     
@@ -172,13 +176,13 @@
         } else {
             result = $.scrollbar({
                 scrollpane:    field,
-                scrollcontent: content,
+                scrollcontent: content/*,
                 options: {
                     orientation: 'vertical',
                     css: {
                         position: 'absolute'
                     }
-                }
+                }*/
             });
         }
         
@@ -472,7 +476,8 @@
             });
         this.content
             .css({
-                background: styles.main.background
+                background: styles.main.background,
+		height: this.opt.up.heightContent
             });
         this.box
             .addClass('select-box')
@@ -487,7 +492,8 @@
                 'border-radius': styles.border['border-radius'],
                 'border-width': styles.border['border-width'],
                 'border-color': styles.border['border-color'],
-                'border-style': styles.border['border-style']
+                'border-style': styles.border['border-style'],
+		height: this.opt.down.height
             })
             .html('<span>' + this.selected.id + '</span>');
         
@@ -836,7 +842,7 @@
                 loc_margin = margin;
             }
 
-            top = (Math.abs(loc_margin) / params.percentContent)*params.percentSlider;
+            top = (Math.abs(loc_margin) / params.percentContent) * params.percentSlider;
 
 
             this.slider.css('top', top + 'px');
