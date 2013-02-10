@@ -1,0 +1,28 @@
+{
+    "name": "selectimus",
+    "title": "jQuery.selectimus",
+    "description": "Selectimus jQuery plugin allows to replace standart selects in each browser by identical ones.",
+    "keywords": [
+        "select",
+        "ui",
+        "input",
+        "form",
+        "option"
+    ],
+    "version": "1.0.0",
+    "author": {
+        "name": "Egor Skorobogatov",
+        "url": "http://188.127.227.198:3000/"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/git-decadent/selectimus/blob/master/LICENSE-mit.md"
+        }
+    ],
+    "bugs": "https://github.com/git-decadent/selectimus/issues",
+    "homepage": "https://github.com/git-decadent/selectimus",
+    "dependencies": {
+        "jquery": ">=1.5.2"
+    }
+}
