@@ -1,4 +1,5 @@
 <h1>Selectimus</h1>
+<h2>jQuery plugin for change standard select element.</h2>
 <a target="_blank" href="http://188.127.227.198:3000/">Selectimus test page</a>
 <h3>Description</h3>
 <p>
@@ -53,11 +54,14 @@ If no styles was transferred, default styles would be applied to:
 </p>
 <div class="highlight">
  <pre>
-   background: 'white',
-   display: 'block',
-   'border-width': '1',
+   color: '#000',
+   background: '#FFF',
+   color_up: '#FFF',
+   background_up: '#7EA0FA',
+   display: 'inline-block',
+   'border-width': '1px',
    'border-style': 'solid',
-   'border-color': '#e5e5e5',
+   'border-color': '#b6b6b6',
    'border-radius': '5px',
    margin: '3px 0',
    position: 'relative',
