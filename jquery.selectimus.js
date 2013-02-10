@@ -1,10 +1,10 @@
 /*!
 *
-* Selectimus 0.1.0
+* Selectimus 1.0.0
 * Copyright 2012, Egor Skorobogatov
 * egor.skorobogatov@gmail.com
 *
-* Released under the MIT, BSD, and GPL Licenses
+* Released under the MIT license.
 * https://github.com/git-decadent/selectimus
 *
 * Change of standart selects in browser.
@@ -19,10 +19,10 @@
         // required styles for selects on default
         default_styles = function () {
             return {
-		color:      '#000',
-                background: '#FFF',
-		color_up:        '#FFF',
-		background_up:   '#7ea0fa',
+                color:           '#000',
+                background:      '#FFF',
+                color_up:        '#FFF',
+                background_up:   '#7ea0fa',
                 display:         'inline-block',
                 'border-width':  '1px',
                 'border-style':  'solid',
@@ -47,7 +47,7 @@
 
     // subselect extra options setup
     function setSettings(opt, style) {
-        var i;
+        var i,
             options = {
                 width: 5,
                 height: 5
@@ -58,32 +58,38 @@
                 style[i] = parseInt(style[i], 10) + opt[i] * options[i] + 'px';
             }
         }
-        
     }
 
     // Select styles receiving
     function getStyles(element, def_style, settings) {
         var i,
-            result = {},
+            result = {
+		main: {},
+		border: {}
+	    },
             value,
             styles = ['width', 'height'];
 
         // Add the default styles and the styles passed by the user to the result
         if (def_style.height !== undefined) {
-            result.height = parseInt(def_style.height, 10);
+            result.main.height = parseInt(def_style.height, 10);
         } else {
-            result.height = element[0].clientHeight >= 22 ? element[0].clientHeight : 22;
+            result.main.height = element[0].clientHeight >= 22 ? element[0].clientHeight : 22;
         }
-        result.width = element[0].clientWidth;
+        result.main.width = element[0].clientWidth;
 
         if (window.navigator.appName == 'Opera') {
-            result['line-height'] = result.height - def_style['border-width'] * 2 + 'px';
+            result.main['line-height'] = result.main.height - def_style['border-width'] * 2 + 'px';
         } else {
-            result['line-height'] = result.height + 'px';
+            result.main['line-height'] = result.main.height + 'px';
         }
         
         for (i in def_style) {
-            result[i] = def_style[i];
+            if (i.search('border') >= 0) {
+                result.border[i] = def_style[i];
+            } else {
+                result.main[i] = def_style[i];
+            }
         }
 
         // For Safari – take out some style by means of the set keys
@@ -94,9 +100,8 @@
 
         // If extra options are passed than use them to the styles
         if (settings !== undefined) {
-            setSettings(settings, result);
+            setSettings(settings, result.main);
         }
-
         return result;
     }
     
@@ -105,7 +110,8 @@
         var self = this,
             ul = $('<ul>'),
             li;
-            
+        
+        self.length = 0;
         ul.addClass('selectimus_ul');
         
         // Correction for Opera. Consider the height of the frames while
@@ -118,8 +124,8 @@
         }*/
         
         // Subselect list lines
-	$.each(options, function (k, v) {
-            
+        $.each(options, function (k, v) {
+            self.length += 1;
             if (v.value == element.val()) {
                 self.selected.count = k;
                 self.selected.id = element.val();
@@ -127,7 +133,7 @@
 
             li = $('<li>')
                 .attr({value: k})
-                .css('height', styles.height).html(v.innerHTML);
+                .css('height', styles.main.height).html(v.innerHTML);
                 
             ul.append(li);
     
@@ -160,7 +166,7 @@
     // Scrollbar setup
     function setScrolbar(field, content, options) {
         var result;
-	
+    
         if (options.up.height == options.up.heightContent) {
             result = false;
         } else {
@@ -183,7 +189,7 @@
     function moveTo(margin, down) {
         var loc_margin;
         
-        if (down === true || Math.abs(margin) < this.content.height() - parseInt(this.opt.up.height, 10)) {
+        if (down === true || Math.abs(margin) < this.content.height() - this.opt.up.heightParse) {
             loc_margin = margin;
         } else {
             loc_margin = 0;
@@ -222,32 +228,29 @@
                 
                 if (code != 13) {
                     index = code == 40 ? 1 : -1;
-                    
                     if ((over == (len - 1) && index == 1) || (over == 0 && index == -1)) {
                         return false;
                     }
-                    
-                    d_heig = parseInt(this.opt.down.height, 10);
-                    u_heig = parseInt(this.opt.up.height, 10);
+                    d_heig = this.opt.down.heightParse;
+                    u_heig = this.opt.up.heightParse;
                     
 		    lines.css({
 			background: this.opt.down.background,
 			color:      this.opt.down.color
 		    });
-                    lines.eq(over + index).css({
+		    lines.eq(over + index).css({
 			background: this.opt.up.background,
 			color:      this.opt.up.color
 		    });
-                    this.selected.over += index;
+		    this.selected.over += index;
 		    
 		    if (code == 40 && (this.selected.count * d_heig > -1 * parseInt(this.content.css('margin-top'), 10) - this.current_stop - d_heig*2)) {
-                        this.current_step += index;
-                        this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false); 
+			this.current_step += index;
+			this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false); 
 		    } else if (code == 38 && (this.selected.count * d_heig == -1 * parseInt(this.content.css('margin-top'), 10))) {
-                        this.current_step += index;
-                        this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false); 
+			this.current_step += index;
+			this.scrollbar.move(-1  * u_heig * (this.current_step - 1), false);
 		    }
-		    
                 // For Enter pressing cause event listener for click event on the Document -
                 // select_hide will work
                 } else {
@@ -255,110 +258,139 @@
                 }
                 
         }
+    };
+    
+    function SelectToggle () {
     }
+    SelectToggle.prototype.select_hide = function (e) {
+	var self = this;
+	
+	curr_select = undefined;
+	this.opened = false;
+	this.button.show();
+	
+	this.div.css({
+	    height: this.opt.down.height,
+	    zIndex: this.opt.down.zIndex
+	});
+	this.box
+	    .removeClass('select-box-open')
+	    .css({
+		height: this.opt.down.height,
+		visibility: this.opt.down.visibility
+	    });
+	this.current_line
+	    .css({
+		background: this.opt.down.background,
+		'border-bottom': this.opt.border['border-width'] + ' ' +
+			 this.opt.border['border-style'] + ' ' +
+			 this.opt.border['border-color'],
+		'border-radius': this.opt.border['border-radius'],
+		'box-shadow': ''
+	    });
+	
+	if (this.scrollbar !== false) {
+	    this.scrollbar.move(-1 * this.selected.count * this.opt.down.heightParse, true);
+	    this.scrollbar.hide();
+	} else {
+	    moveTo.call(this, -1 * this.selected.count * this.opt.down.heightParse, true);
+	}
+	
+	this.box.find('LI').unbind('mouseenter');
+	this.box.find('LI').css({
+	    background: this.opt.down.background,
+	    color:      this.opt.down.color
+	});
+	this.parent.val(this.selected.id);
+	this.current_line.html('<span>' + this.selected.id + '</span>');
+	this.div.one('click', function (e) {
+	    self.select_open(e);
+	});
+    };
+        
+    // the first select click
+    SelectToggle.prototype.select_open = function (e) {
+	var self = this;
+	
+	documentClick();
+	
+	curr_select = this;
+	
+	e.stopPropagation();
+	this.opened = true;
+	this.button.hide();
+	this.div
+	    .css({
+		height: this.opt.up.height,
+		zIndex: this.opt.up.zIndex
+	    });
+	this.box
+	    .addClass('select-box-open')
+	    .css({
+		position: this.opt.up.position,
+		border: this.opt.border['border-width'] + ' ' +
+			 this.opt.border['border-style'] + ' ' +
+			 this.opt.border['border-color'],
+		'border-radius': '0 0 ' + this.opt.border['border-radius'] + ' ' + this.opt.border['border-radius'],
+		height: this.opt.up.height,
+		visibility: this.opt.up.visibility,
+		'margin-top': this.opt.down.height,
+		'border-top-right-radius': 0,
+		'border-top-left-radius': 0
+	    });
+	this.current_line
+	    .css({
+		background: this.opt.up.background,
+		'border-bottom': '0 none',
+		'border-bottom-right-radius': 0,
+		'border-bottom-left-radius': 0,
+		'box-shadow': '4px 3px 6px #CCCCCC'
+	    });
+	    
+	    
+	this.box.append();
+	
+	this.selected.over = this.selected.count;
+	this.box.find('LI').eq(this.selected.count).css({
+	    background: this.opt.up.background,
+	    color:      this.opt.up.color
+	});
+	
+	this.box.find('LI').bind('mouseenter', function (e) {
+	    self.box.find('LI').css({
+	    background: self.opt.down.background,
+	    color:      self.opt.down.color
+	    });
+	    $(e.target).css({
+	    background: self.opt.up.background,
+	    color:      self.opt.up.color
+	    });
+	    self.selected.over = parseInt(e.target.getAttribute('value'), 10);
+	});
+	
+	if (this.scrollbar === undefined) {
+	    this.scrollbar = setScrolbar(this.box, this.content, this.opt);
+	}
+	
+	if (this.scrollbar !== false) {
+	    this.scrollbar.show();
+	    this.scrollbar.move(-1  * this.opt.up.heightParse * (this.current_step - 1), false);
+	} else {
+	    moveTo.call(this, -1 * this.selected.count * this.opt.down.heightParse);
+	}
+	
+	// When click on any place of the document the select is to be rolled down
+	loc_document.one('click', function (e) {
+	    self.select_hide(e);
+	});
+    };
     
     // Event agents for the new subselect attach
     function setEvents() {
         var self = this;
-        
-        // Repeated click on the select
-        function select_hide(e) {
-            
-            curr_select = undefined;
-            self.opened = false;
-            self.button.show();
-            
-            self.div.css({
-                border: self.opt.up.border,
-                height: self.opt.down.height,
-                zIndex: self.opt.down.zIndex
-            });
-            self.box
-                .removeClass('select-box-open')
-                .css({
-                    border: self.opt.down.border,
-                    borderTop: self.opt.up.borderTop,
-                    height: self.opt.down.height
-                });
-            
-            if (self.scrollbar !== false) {
-                self.scrollbar.move(-1 * self.selected.count * parseInt(self.opt.down.height, 10), true);
-                self.scrollbar.hide();
-            } else {
-                moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height, 10), true);
-            }
-            
-            self.box.find('LI').unbind('mouseenter');
-	    self.box.find('LI').css({
-		background: self.opt.down.background,
-		color:      self.opt.down.color
-	    });
-            self.parent.val(self.selected.id);
-            self.div.one('click', select_open);
-        }
-        
-        // the first select click
-        function select_open(e) {
-            
-            curr_select = self;
-
-            documentClick();
-            e.stopPropagation();
-            self.opened = true;
-            self.button.hide();
-            self.div
-                .css({
-                    borderBottom: self.opt.up.borderTop,
-                    borderLeft: self.opt.up.borderTop,
-                    borderRight: self.opt.up.borderTop,
-                    overflow: self.opt.up.overflow,
-                    height: self.opt.up.height,
-                    zIndex: self.opt.up.zIndex
-                });
-            self.box
-                .addClass('select-box-open')
-                .css({
-                    position: self.opt.up.position,
-                    border: self.opt.up.border,
-                    borderTop: self.opt.up.borderTop,
-                    height: self.opt.up.height
-                });
-            
-            self.selected.over = self.selected.count;
-            self.box.find('LI').eq(self.selected.id).css({
-		background: default_styles.background2,
-		color:      default_styles.color2
-	    });
-            
-            self.box.find('LI').bind('mouseenter', function (e) {
-		self.box.find('LI').css({
-		    background: self.opt.down.background,
-		    color:      self.opt.down.color
-		});
-		$(e.target).css({
-		    background: self.opt.up.background,
-		    color:      self.opt.up.color
-		});
-                self.selected.over = parseInt(e.target.getAttribute('value'), 10);
-            });
-            
-            if (self.scrollbar === undefined) {
-                self.scrollbar = setScrolbar(self.box, self.content, self.opt);
-            }
-            
-            if (self.scrollbar !== false) {
-                self.scrollbar.show();
-                self.scrollbar.move(-1 * self.selected.count * parseInt(self.opt.down.height, 10), false);
-            } else {
-                moveTo.call(self, -1 * self.selected.count * parseInt(self.opt.down.height, 10));
-            }
-            
-            // When click on any place of the document the select is to be rolled down
-            loc_document.one('click', select_hide);
-        }
-        
-        this.div.one('click', select_open);
-        
+	this.div.one('click', function (e) {
+	    self.select_open(e);
+	});
     }
     
     // Function for inheritance Prototype.
@@ -366,17 +398,22 @@
         var F = function() { },
             i,
             instance;
-    
+	    
         F.prototype = Parent.prototype;
+	for (i in Child.prototype) {
+	    F.prototype[i] = Child.prototype[i]; 
+	}
         Child.prototype = new F();
-        Child.prototype.constructor = Child[i];
+        Child.prototype.constructor = Child;
         Child.superclass = Parent.prototype;
-        
     }
-    
     
     // subselect creation
     function CreateClone(styles, element, options, settings) {
+        var i,
+            tmp_rows = (settings !== undefined && settings.rows !== undefined) ? settings.rows : default_rows,
+            // the number of elements inside the select
+            rows = options.length < tmp_rows ? options.length : tmp_rows;
         
         // link to the changing select chosen option
         this.selected = {};
@@ -385,6 +422,8 @@
         this.div = $('<div>');
         // contents container
         this.box = $('<div>');
+        // selected line
+        this.current_line = $('<div>');
         // select contents
         this.content = createContent.call(this, styles, element, options);
         // select open button
@@ -394,62 +433,80 @@
         // open/close select flag
         this.opened = false;
         
-        var i,
-            tmp_rows = (settings !== undefined && settings.rows !== undefined) ? settings.rows : default_rows,
-            // the number of elements inside the select
-            rows = options.length < tmp_rows ? options.length : tmp_rows;
-            
         // add to pseudoselect the styles taken from the select
-        for (i in styles) {
-            this.div.css(i, styles[i]);
+        for (i in styles.main) {
+            this.div.css(i, styles.main[i]);
         }
         
         // Styles for convoluted subselect
         this.opt.down = {
-            height: styles.height,
+            height: styles.main.height,
+            heightParse: parseInt(styles.main.height, 10),
             overflow: 'hidden',
             border: '0 none',
             zIndex: 1,
-	    background: styles.background,
-	    color: styles.color
+            background: styles.main.background,
+            visibility: 'hidden',
+            color: styles.main.color
         };
         // Styles for open subselect
         this.opt.up = {
             rows: rows,
-            heightContent: options.length * parseInt(styles.height, 10) + 'px',
-            height: rows * parseInt(styles.height, 10) + 'px',
+            heightContent: options.length * parseInt(styles.main.height, 10) + 'px',
+            height: rows * parseInt(styles.main.height, 10) + 'px',
+            heightParse: rows * parseInt(styles.main.height, 10),
             overflow: 'visible',
             position: 'absolute',
-            border: styles.border,
             borderTop: '0 none',
             zIndex: 100000000,
-	    background: styles.background_up,
-	    color: styles.color_up
+            background: styles.main.background_up,
+            color: styles.main.color_up,
+            visibility: 'visible'
         };
+        this.opt.border = styles.border;
         // Setup the button in the center in accordance with the pseudoselect height
         this.button
             .addClass('select-button-close')
             .css({
-                top: (parseInt(styles.height, 10) - min_height) / 2 + 'px'
+                top: (this.opt.down.heightParse - min_height) / 2 + 'px'
+            });
+        this.content
+            .css({
+                background: styles.main.background
             });
         this.box
             .addClass('select-box')
             .css({
                 height: this.opt.down.height,
-                background: styles.background_down,
-                'border-radius': styles['border-radius']
+                background: styles.main.background,
+                visibility: this.opt.down.visibility
             });
-
+        this.current_line
+            .addClass('current_line')
+            .css({
+                'border-radius': styles.border['border-radius'],
+                'border-width': styles.border['border-width'],
+                'border-color': styles.border['border-color'],
+                'border-style': styles.border['border-style']
+            })
+            .html('<span>' + this.selected.id + '</span>');
         
-        this.current_step = 1;
-        this.current_stop = -1 * parseInt(this.opt.up.height, 10);
-
+        if (this.length - this.selected.count <= tmp_rows) {
+            this.current_step = Math.ceil(this.length / tmp_rows);
+        } else {
+            this.current_step = Math.ceil(this.selected.count == 0 ? 1 : this.selected.count / tmp_rows);
+        }
+        this.current_stop = -1 * this.opt.up.heightParse;
+	
         this.div.addClass('selectimus');
         this.box.append(this.content);
+        this.div.append(this.current_line);
         this.div.append(this.button);
         this.div.append(this.box);
+	
         setEvents.call(this);
-        moveTo.call(this, -1 * this.selected.count * parseInt(this.opt.down.height, 10), true);
+	
+        moveTo.call(this, -1 * this.selected.count * this.opt.down.heightParse, true);
         
     }
     
@@ -472,12 +529,13 @@
         
     }
     
+    extend(CreateClone, SelectToggle);
     extend(CreateClone, KeyCodeContructor);
 
     loc_document.bind('keydown', function (e) {
-	if (curr_select !== undefined) {
-	    curr_select.keyCodeOn(e);
-	}
+        if (curr_select !== undefined) {
+            curr_select.keyCodeOn(e);
+        }
     });
     
     // method add to jQuery object
@@ -505,7 +563,6 @@
             }
         });
 	
-        
         return this;
     };
     
@@ -537,8 +594,8 @@
             var scrollpane_h     = scrollpane.height(),
                 scrollcontent_h  = scrollcontent.height(),
                 scrollbar_wrap_h = scrollpane_h - scrollpane_h * 0.02,
-                diff1	         = scrollcontent_h - scrollpane_h,
-                prop	         = diff1 / scrollcontent_h,
+                diff1            = scrollcontent_h - scrollpane_h,
+                prop             = diff1 / scrollcontent_h,
                 scroll_area      = scrollbar_wrap_h - def_opt.btnsWidth * 2,
                 stopScroll       = Math.floor(scroll_area * prop),
                 size_slider      = scrollbar_wrap_h - def_opt.btnsWidth * 2 - stopScroll - def_opt.bordersWidth * 2,
@@ -613,7 +670,7 @@
             });
             // slider
             this.slider = $('<div>').addClass('w-slider').css({
-                top:	0,
+                top:   0,
                 width: def_opt.btnsWidth - 2 + 'px',
                 height: this.params.size_slider + 'px'
             }).append("<span style='margin:" + this.params.size_slider / 2 +"px auto;'></span>");
@@ -629,12 +686,12 @@
             (function draggable() {
                 var top,
                     y;
-		    
-		// the slider position relative to it`s start position and the current cursor position calculation
+            
+        // the slider position relative to it`s start position and the current cursor position calculation
                 function moveSlider(e) {
                                 
                     e.preventDefault();
-		    
+            
                     if (top + e.clientY - y < 1) {
                         self.slider.css({
                             'top': 0
@@ -645,10 +702,10 @@
                         return false;
                     } else if (top + e.clientY - y > self.params.stopScroll - 1) {
                         self.slider.css({
-			    'top': self.params.stopScroll
+                            'top': self.params.stopScroll
                         });
                         self.scrollcontent.css({
-			    'margin-top': self.params.scrollcontent_stop + 'px'
+                            'margin-top': self.params.scrollcontent_stop + 'px'
                         });
                         return false;
                     } else {
@@ -660,7 +717,7 @@
                         });
                     }
                 }
-		
+        
                 // the slider movement stop
                 function mouseupSlider(e) {
                     loc_document.unbind('mousemove', moveSlider);
@@ -691,8 +748,8 @@
                 'mousedown': function (e) {
                     //e.stopPropagation();
                     var it,
-		        im,
-			stop;
+                        im,
+                        stop;
                     
                     if (e.target == self.scroll_top[0]) {
                         it = -1;
