@@ -7,23 +7,28 @@
 	padding: 0;
 	margin: 0;
 }
-.selectimus_ul {
+.selectimus .selectimus_ul {
 	list-style-type: none;
 }
-.selectimus_ul  LI {
+.selectimus .selectimus_ul  LI {
      	display: inline-block;
 	padding: 0 0 0 5px;
-}
-.selectimus_ul .sel_hover {
-	background: #7ea0fa;
-	color: white;
 }
 .selectimus .select-box {
 	overflow: hidden;
 	width: inherit;
 	left: 0;
 	position: absolute;
-        cursor: default;    
+        cursor: default;
+	text-align: left;
+	border-top: 2px solid inherit !important; 
+}
+.selectimus .current_line {
+    position: absolute;
+    text-align: left;
+}
+.selectimus .current_line > SPAN {
+    padding: 0 0 0 5px;
 }
 .selectimus .select-box-open { 
         box-shadow: 3px 3px 6px #CCCCCC;
@@ -78,14 +83,9 @@
         background-image: -o-linear-gradient(left, #D3D3D3, #ffffff);
         background-image: -ms-linear-gradient(left, #D3D3D3, #ffffff);
         background-image: linear-gradient(left, #D3D3D3, #ffffff);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#D3D3D3,', endColorstr='#ffffff');
 	background-color: #EADEDE;
 	border: 1px solid #969696;
 	border-radius: 3px 3px 3px 3px;
 	position: relative;
 }
-
-
-
-
-
-
