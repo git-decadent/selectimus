@@ -5,7 +5,7 @@
 
 
 Selectimus jQuery plugin allows to replace a standart select a browser to identical one. 
-To change default scrollbar scrollbarJS jQuery plugin is used which is included in selectimus.js. 
+To change default scrollbar [scrollbarJS](https://github.com/git-decadent/scrollbarJS) jQuery plugin is used which is included in selectimus.js. 
 Supported browsers: Chrome, Firefox, Opera, Safari, IE7+. 
 
 **Init method:**
